@@ -1,53 +1,24 @@
+import re
+
 f = open("Day05.txt","r")
 s = f.readlines()
 
 p1 = 0
+p2 = 0
 
+v = re.compile(r"a|e|i|o|u")
+dub = re.compile(r"(.)\1{1}")
+dis = re.compile(r"ab|cd|pq|xy")
+
+one_apart = re.compile(r"(.).\1{1}")
+pairofpairs = re.compile(r"(..).*\1{1}")
+    
 for l in s:
-    vowels = 0
-    double = False
-    disallowed = False
-
-    prev = " "
-    for c in l:
-        if c in "aeiou":
-            vowels += 1
-        if (c == prev):
-            double = True
-        dis = prev + c
-        if dis in "ab,cd,pq,xy":
-            disallowed = True
-            break
-        prev = c
-
-    if not disallowed and vowels > 2 and double:
+    if len(v.findall(l)) > 2 and len(dub.findall(l)) > 0 and len(dis.findall(l)) == 0:
         p1 += 1
     
+    if len(one_apart.findall(l)) > 0 and len(pairofpairs.findall(l)) > 0:
+        p2 += 1   
+
 print("Part 1: " + str(p1))
-
-p2 = 0
-for l in s:
-
-    pairs = set()
-    prev = " "
-    prevprev = " "
-
-    pairofpairs = False
-    repeat2apart = False
-
-    for c in l:
-
-        if (c == prevprev):
-            repeat2apart = True
-        d = prev + c
-        if (d in pairs) and not (c == prev and c == prevprev):
-            pairofpairs = True
-        pairs.add(d)
-        
-        prevprev = prev
-        prev = c
-
-    if repeat2apart and pairofpairs:
-        p2 += 1
-
 print("Part 2: " + str(p2))
