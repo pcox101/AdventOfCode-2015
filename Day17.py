@@ -51,5 +51,4 @@ for l in ways.keys():
     elif len(ln) == m:
         c += 1
 
-print(m)
 print("Part 2: " + str(c))
