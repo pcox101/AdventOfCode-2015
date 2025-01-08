@@ -14,7 +14,7 @@ part1_done = False
 part2_done = False
 while not (part1_done and part2_done):
     house_number += 1
-    divs = divisors(house_number)
+    divs = divisors(house_number, generator=True)
     if (not part1_done):
         part1_val = sum(divs) * 10
         if (part1_val >= input):
