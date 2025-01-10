@@ -4,102 +4,35 @@ import math
 f = open("Day24.txt","r")
 s = f.readlines()
 
-weights = list(map(lambda x: int(x), s))
-weights.sort()
-
-def get_part_one():
-
-    group_total = sum(weights) // 3
-    print(group_total)
-
-    for i in range(1,len(weights) - 1):
-        print("Testing length : " + str(i))
-        possible_options = list()
-        for firstList in (list(tup) for tup in itertools.combinations(weights, i)):
-            if sum(firstList) != group_total:
-                continue
-
-            qe = math.prod(firstList)
-
-            # No need to check it if it's not already better
-            if len(possible_options) > 0 and qe >= min(possible_options):
-                continue
-            
-            foundOptionForThisGroup = False
-            remainingList = list(filter(lambda x: not x in firstList, weights))
-
-            for j in range(1, len(remainingList) - 1):
-                for secondList in (list(tup) for tup in itertools.combinations(remainingList, j)):
-                    if sum(secondList) != group_total:
-                        continue
-
-                    print("Found option - qe = " + str(qe))
-                    possible_options.append(qe)
-                    foundOptionForThisGroup = True
-                    break
-                
-                if foundOptionForThisGroup:
-                    break
-            if foundOptionForThisGroup:
-                break
-        if (len(possible_options) > 0):
-            break
-
-    # Get the lowest quantum entanglement
-    return min(possible_options)
-
-def get_part_two():
+# I'm tempted to say that this logic won't work for all examples, given that we need to find the group with the lowest
+# product. It gives the right answer, and that is probably because we are working with a sorted list where, for example,
+# 4x11 (44) is found before 5x10 (55) and 6x9 (54) but I can't be sure that that is always the case
+def get_groups(group_to_split, number_of_groups):
     
-    group_total = sum(weights) // 4
-    print(group_total)
+    group_total = sum(group_to_split) // number_of_groups
+
+    if number_of_groups == 1:
+        return group_to_split
     
-    for i in range(1,len(weights) - 1):
-        print("Testing length : " + str(i))
-        possible_options = list()
-        for firstList in (list(tup) for tup in itertools.combinations(weights, i)):
-            if sum(firstList) != group_total:
-                continue
-            
-            qe = math.prod(firstList)
-
-            # No need to check it if it's not already better
-            if len(possible_options) > 0 and qe >= min(possible_options):
-                continue
-            
-            remainingListAfterFirst = list(filter(lambda x: not x in firstList, weights))
-
-            foundOptionForThisGroup = False
-            for j in range(1, len(remainingListAfterFirst) - 1):
-                for secondList in (list(tup) for tup in itertools.combinations(remainingListAfterFirst, j)):
-                    if (sum(secondList) != group_total):
-                        continue
-                    
-                    remainingListAfterSecond = list(filter(lambda x: not x in secondList, remainingListAfterFirst))
-
-                    for k in range(1, len(remainingListAfterSecond) - 1):
-                        for thirdList in (list(tup) for tup in itertools.combinations(remainingListAfterSecond, k)):
-                            fourthList = list(filter(lambda x: not x in thirdList, remainingListAfterSecond))
-
-                            if sum(thirdList) != group_total:
-                                continue
-                    
-                            print("Found option - qe = " + str(qe))
-                            possible_options.append(qe)
-                            foundOptionForThisGroup = True
-                            break
-
-                        if foundOptionForThisGroup:
-                            break
-                    if foundOptionForThisGroup:
-                        break
-                if foundOptionForThisGroup:
-                        break
+    for i in range(1,len(group_to_split) - 1):
         
-        if len(possible_options) > 0:
-            break
+        for firstList in (list(tup) for tup in itertools.combinations(group_to_split, i)):
+            if sum(firstList) != group_total:
+                continue
 
-    # Get the lowest quantum entanglement
-    return min(possible_options)
+            remainingList = list(filter(lambda x: not x in firstList, group_to_split))
 
-print("Part 1: " + str(get_part_one()))
-print("Part 2: " + str(get_part_two()))
+            # The remaining list needs to be split into (number_of_groups - 1) groups
+            # Where each group adds up to the group_total
+            possible_option = get_groups(remainingList, number_of_groups - 1)
+            
+            if len(possible_option) > 0:
+                return firstList    
+    
+    return list()
+
+
+weights = list(map(lambda x: int(x), s))
+
+print("Part 1: " + str(math.prod(get_groups(weights, 3))))
+print("Part 2: " + str(math.prod(get_groups(weights, 4))))
